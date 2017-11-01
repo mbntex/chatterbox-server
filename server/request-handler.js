@@ -21,6 +21,8 @@ this file and include it in basic-server.js so that it actually works.
 // Another way to get around this restriction is to serve you chat
 // client from this domain by setting up static file serving.
 var queryString = require('querystring');
+var url = require('url');
+var fs = require('fs');
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -31,29 +33,63 @@ var defaultCorsHeaders = {
 
 
 
+var madeUpDataBase;
 
-var madeUpDataBase = [
-  {
-    username: 'Jeff',
-    text: 'Add Return'
-  }, 
-  {
-    username: 'Michael',
-    text: 'It is Returned'
-  },
-  {
-    username: 'Carl',
-    text: 'The zombies have returned.'
-  }
-];
+var readFile = function () {
+  fs.readFile('./database.json', 'utf8', function (err, data) {
+    if (err) {
+      return console.log (err);
+    }
+    console.log ('incoming data from fild: ', data);
+    madeUpDataBase = JSON.parse(data);
+    console.log ('madeUpDataBase', madeUpDataBase);
+    console.log ('type of madeUpDataBase', typeof madeUpDataBase);
+  });
+};
+readFile();
+
+
+var writeFile = function () {
+  fs.writeFile('./database.json', JSON.stringify(madeUpDataBase), function (err) {
+    if (err) {
+      return console.log ('there was an error in writing the database to a file');
+    }
+    return console.log ('your data was saved!!');
+  });
+};
+
+writeFile();
+
+
+
+//var fileServerFunction = function (req, res) {
+//   console.log('CURRENT REQUEST URL = ', req.url);
+//   var urlPath = url.parse(req.url, true);
+//   //console.log('INFO = ', urlPath.pathname);
+//   //if (urlPath.pathname === '/index.html') {
+//   fs.readFile('./client/' + urlPath.pathname, function (err, data) {
+//     if (err) {
+//       console.log('ERROR');
+//       res.writeHead(404);
+//       res.end('FILE NOT FOUND');
+//       return;
+//     }
+//     res.writeHead(200, defaultCorsHeaders);
+//     res.write(data);
+//     res.end();
+//     return;
+//   });
+//   //}
+// };
+
 
 var requestHandler = function(request, response) {
-  console.log ('Start of Request');
+  // console.log ('Start of Request');
   var statusCode = 404;
   var headers = defaultCorsHeaders;
   var expectedURL = '/classes/messages';
   headers['Content-Type'] = 'text/plain'; // You will need to change this if you are sending something other than plain text, like JSON or HTML.
-  //console.log('URL request', url.request);
+  // console.log('URL request', request.url);
 
   // console.log (request);
   if (request.method === 'OPTIONS') {
@@ -63,12 +99,32 @@ var requestHandler = function(request, response) {
     response.end();
     return;
   }
+
+
+
   
   if (request.method === 'GET' && request.url.includes(expectedURL)) { 
     // console.log ('GET');
     statusCode = 200;
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify({results: madeUpDataBase}));
+    return;
+  } else if (request.method === 'GET') { 
+    // console.log('CURRENT REQUEST URL = ', req.url);
+    var urlPath = url.parse(request.url, true);
+    fs.readFile('./client/' + urlPath.pathname, function (err, data) {
+      if (err) {
+        console.log('ERROR');
+        response.writeHead(404);
+        response.end('FILE NOT FOUND');
+        return;
+      }
+      headers['Content-Type'] = '';
+      response.writeHead(200, defaultCorsHeaders);
+      response.write(data);
+      response.end();
+      return;
+    });
     return;
   }
 

@@ -40,10 +40,17 @@ server.listen(port, ip);
 // server.listen() will continue running as long as there is the
 // possibility of serving more requests. To stop your server, hit
 // Ctrl-C on the command line.
+///////////////////////////////////////////////////////////////////////////////////
 
-
+// var defaultCorsHeaders = {
+//   'access-control-allow-origin': '*',
+//   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+//   'access-control-allow-headers': 'content-type, accept',
+//   'access-control-max-age': 10 // Seconds.
+// };
 
 // var fileServerFunction = function (req, res) {
+//   console.log ("Method", req.method)
 //   console.log('CURRENT REQUEST URL = ', req.url);
 //   var urlPath = url.parse(req.url, true);
 //   //console.log('INFO = ', urlPath.pathname);
@@ -55,16 +62,13 @@ server.listen(port, ip);
 //       res.end('FILE NOT FOUND');
 //       return;
 //     }
-//     res.writeHead(200);
+//     res.writeHead(200, defaultCorsHeaders);
 //     res.write(data);
 //     res.end();
 //     return;
 //   });
 //   //}
 // };
-
-
-
 // var fileServer = http.createServer(fileServerFunction);
 // console.log('Listening on http://' + ip + ':' + 8080);
 // fileServer.listen(8080, ip);
