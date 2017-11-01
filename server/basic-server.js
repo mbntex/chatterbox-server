@@ -1,6 +1,8 @@
 /* Import node's http module: */
 var http = require('http');
 var handleRequest = require('./request-handler.js');
+var url = require('url');
+var fs = require('fs');
 
 // Every server needs to listen on a port with a unique number. The
 // standard port for HTTP servers is port 80, but that port is
@@ -38,4 +40,36 @@ server.listen(port, ip);
 // server.listen() will continue running as long as there is the
 // possibility of serving more requests. To stop your server, hit
 // Ctrl-C on the command line.
+
+
+
+// var fileServerFunction = function (req, res) {
+//   console.log('CURRENT REQUEST URL = ', req.url);
+//   var urlPath = url.parse(req.url, true);
+//   //console.log('INFO = ', urlPath.pathname);
+//   //if (urlPath.pathname === '/index.html') {
+//   fs.readFile('./client/' + urlPath.pathname, function (err, data) {
+//     if (err) {
+//       console.log('ERROR');
+//       res.writeHead(404);
+//       res.end('FILE NOT FOUND');
+//       return;
+//     }
+//     res.writeHead(200);
+//     res.write(data);
+//     res.end();
+//     return;
+//   });
+//   //}
+// };
+
+
+
+// var fileServer = http.createServer(fileServerFunction);
+// console.log('Listening on http://' + ip + ':' + 8080);
+// fileServer.listen(8080, ip);
+
+
+
+
 

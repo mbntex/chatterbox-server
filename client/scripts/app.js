@@ -63,6 +63,7 @@ var app = {
       data: { order: '-createdAt' },
       // contentType: 'application/json',
       contentType: 'application/json',
+      crossDomain: true,
       success: function(data) {
         var data = JSON.parse(data);
         // console.log('DATA IN CLIENT = ', data);

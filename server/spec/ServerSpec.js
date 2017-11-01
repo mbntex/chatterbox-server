@@ -11,7 +11,7 @@ var waitForThen = function (test, cb) {
 };
 
 describe('Node Server Request Listener Function', function() {
-  xit('Should answer GET requests for /classes/messages with a 200 status code', function() {
+  it('Should answer GET requests for /classes/messages with a 200 status code', function() {
     // This is a fake server request. Normally, the server would provide this,
     // but we want to test our function's behavior totally independent of the server code
     var req = new stubs.request('/classes/messages', 'GET');
@@ -23,7 +23,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  xit('Should send back parsable stringified JSON', function() {
+  it('Should send back parsable stringified JSON', function() {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
@@ -33,7 +33,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  xit('Should send back an object', function() {
+  it('Should send back an object', function() {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
@@ -44,7 +44,7 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
-  xit('Should send an object containing a `results` array', function() {
+  it('Should send an object containing a `results` array', function() {
     var req = new stubs.request('/classes/messages', 'GET');
     var res = new stubs.response();
 
@@ -101,8 +101,78 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+  
+  it('Should respond with pre-existing messages from database before test began', function() {
+    var stubMsg = {
+      username: 'Jeff',
+      text: 'Add Return'
+    };
+    
+    req = new stubs.request('/classes/messages', 'GET');
+    res = new stubs.response();
 
-  xit('Should 404 when asked for a nonexistent file', function() {
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(0);
+    expect(messages[2].username).to.equal('Jeff');
+    expect(messages[2].text).to.equal('Add Return');
+    expect(res._ended).to.equal(true);
+  });
+
+
+  it('Should be able to handle a URI string, because everyone else doesn\'t', function() {
+    var stubMsg = 'username=Bob&message=Hella+Cool!&roomname=lobby';
+    var req = new stubs.requestURIString('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+      // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.requestURIString('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(0);
+    expect(messages[0].username).to.equal('Bob');
+    expect(messages[0].message).to.equal('Hella Cool!');
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should be able to handle other object keys', function() {
+    var stubMsg = {
+      username: 'Jeff',
+      image: 'Add an image ya nut'
+    };
+    var req = new stubs.request('/classes/messages', 'POST', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(201);
+
+      // Now if we request the log for that room the message we posted should be there:
+    req = new stubs.requestURIString('/classes/messages', 'GET');
+    res = new stubs.response();
+
+    handler.requestHandler(req, res);
+
+    expect(res._responseCode).to.equal(200);
+    var messages = JSON.parse(res._data).results;
+    expect(messages.length).to.be.above(0);
+    console.log (messages[0]);
+    expect(messages[0].username).to.equal('Jeff');
+    expect(messages[0].image).to.equal('Add an image ya nut');
+    expect(res._ended).to.equal(true);
+  });
+
+  it('Should 404 when asked for a nonexistent file', function() {
     var req = new stubs.request('/arglebargle', 'GET');
     var res = new stubs.response();
 

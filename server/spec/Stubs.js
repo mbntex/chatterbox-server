@@ -34,6 +34,25 @@ module.exports = {
       }
 
     }.bind(this);
+  },
+
+
+  requestURIString: function(url, method, postdata) {
+    this.url = url;
+    this.method = method;
+    this._postData = postdata;
+    this.setEncoding = function() { /* noop */ };
+
+    this.addListener = this.on = function(type, callback) {
+      if (type === 'data') {
+        callback(this._postData);
+      }
+
+      if (type === 'end') {
+        callback();
+      }
+
+    }.bind(this);
   }
 
 };
